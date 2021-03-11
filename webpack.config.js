@@ -24,13 +24,16 @@ module.exports={
                 loader: 'babel-loader'
             },
             
-            {
-                test: /\.(sa|sc|c)ss$/,
-                use: [
-                    MiniCssExtractPlugin.loader,
-                    'css-loader',
-                    'sass-loader'
-                ]
+             {
+                test: /\.css$/,
+                use:[
+                  'style-loader',
+                  {
+                  loader: 'css-loader',
+                  options : {importLoaders: 1} 
+                  },
+                  'postcss-loader'
+                    ]
             },
 
             {
