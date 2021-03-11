@@ -57,12 +57,14 @@
     "axios": "^0.21.1",
     "dotenv": "^8.2.0",
     "dotenv-webpack": "^6.0.0",
+    "formik": "^2.2.6",
     "history": "^5.0.0",
     "html-webpack-plugin": "^4.5.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-router": "^6.0.0-beta.0",
-    "react-router-dom": "^6.0.0-beta.0"
+    "react-router-dom": "^6.0.0-beta.0",
+    "yup": "^0.32.9"
   },
   "repository": {
     "type": "git",
