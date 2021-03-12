@@ -1,41 +1,74 @@
-import React from 'react';
+import React, { useContext, useState } from 'react';
 import { useFormik } from 'formik';
-import * as Yup from 'yup'
-
-
+import * as Yup from 'yup';
+import { useNavigate } from 'react-router-dom';
+import { FirebaseContext } from '../../firebase';
+import FileUploader from 'react-firebase-file-uploader';
 
 const NuevoPlatillo = () => {
+	// Context con las operaciones de firebase
+	const { firebase } = useContext(FirebaseContext);
 
+	// state para las imagenes
+	const [subiendo, guardarSubiendo] = useState(false);
+	const [progreso, guardarProgreso] = useState(0);
+	const [urlimagen, guardarUrlimagen] = useState('');
+	// Manejando estados de progreso y mas de imagen
+	const handleUploadStart = () => {
+		guardarProgreso(0);
+		guardarSubiendo(true);
+	};
+	const handleUploadError = (error) => {
+		guardarSubiendo(false);
+		console.log(error);
+	};
+	const handleUploadSuccess = async (nombre) => {
+		guardarProgreso(100);
+		guardarSubiendo(false);
 
+		// Almacenar la URL de destino
+		const url = await firebase.storage.ref('productos').child(nombre).getDownloadURL();
 
-  // validación y leer los datos del formulario
-  const formik = useFormik({
-    initialValues: {
-        nombre: '',
-        precio: '',
-        categoria: '',
-        imagen: '',
-        descripcion: '',
-    }, 
-    validationSchema: Yup.object({
-        nombre: Yup.string()
-                    .min(3, 'Los Platillos deben tener al menos 3 caracteres')
-                    .required('El Nombre del platillo es obligatorio'),
-        precio: Yup.number()
-                    .min(1, 'Debes agregar un número')
-                    .required('El Precio es obligatorio'),
-        categoria: Yup.string()
-                    .required('La categoría es obligatoria'),
-        descripcion: Yup.string()
-                    .min(10, 'La descripción debe ser más larga')
-                    .required('La descripción es obligatoria'),
-                    
-    }),
-    onSubmit: platillo => {
-       console.log(platillo)
-    }
-});
+		console.log(url);
+		guardarUrlimagen(url);
+	};
+	const handleProgress = (progreso) => {
+		guardarProgreso(progreso);
 
+	};
+
+	// Hook para redireccionar
+	const navigate = useNavigate();
+
+	// validación y leer los datos del formulario
+	const formik = useFormik({
+		initialValues: {
+			nombre: '',
+			precio: '',
+			categoria: '',
+			imagen: '',
+			descripcion: '',
+		},
+		validationSchema: Yup.object({
+			nombre: Yup.string()
+				.min(3, 'Los Platillos deben tener al menos 3 caracteres')
+				.required('El Nombre del platillo es obligatorio'),
+			precio: Yup.number().min(1, 'Debes agregar un número').required('El Precio es obligatorio'),
+			categoria: Yup.string().required('La categoría es obligatoria'),
+			descripcion: Yup.string()
+				.min(10, 'La descripción debe ser más larga')
+				.required('La descripción es obligatoria'),
+		}),
+		onSubmit: (platillo) => {
+			//console.log(platillo)
+			platillo.existencia = true;
+			platillo.imagen = urlimagen;
+			firebase.db.collection('productos').add(platillo);
+
+			// Redireccionar
+			navigate('/menu'); //in RRD is navigate and not history
+		},
+	});
 
 	return (
 		<>
@@ -117,7 +150,39 @@ const NuevoPlatillo = () => {
 							</div>
 						) : null}
 
-					
+						<div className="mb-4">
+							<label className="block mb-2 text-sm font-bold text-gray-700" htmlFor="imagen">
+								Imagen
+							</label>
+							<FileUploader
+								accept="image/*"
+								id="imagen"
+								name="imagen"
+								randomizeFilename
+								storageRef={firebase.storage.ref('productos')}
+								onUploadStart={handleUploadStart}
+								onUploadError={handleUploadError}
+								onUploadSuccess={handleUploadSuccess}
+								onProgress={handleProgress}
+							/>
+						</div>
+
+						{subiendo && (
+							<div className="relative w-full h-12 border">
+								<div
+									className={"absolute top-0 left-0 flex items-center h-12 px-2 text-sm text-white bg-green-500"}
+									style={{ width: `${progreso}%` }}
+								>
+									{progreso} %
+								</div>
+							</div>
+						)}
+
+						{urlimagen && (
+							<p className="p-3 my-5 text-center text-white bg-green-500">
+								La imagen se subió correctamente
+							</p>
+						)}
 
 						<div className="mb-4">
 							<label className="block mb-2 text-sm font-bold text-gray-700" htmlFor="descripcion">
