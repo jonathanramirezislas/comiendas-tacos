@@ -31,7 +31,7 @@ const Menu = () => {
 	}
 
 	return (
-		<>
+		<div className="ml-80">
 			<h1 className="mb-4 text-3xl font-light">Menu</h1>
 			<Link
 				to="/nuevo-platillo"
@@ -47,7 +47,7 @@ const Menu = () => {
 				/>
 			))}
 
-		</>
+		</div>
 	);
 };
 

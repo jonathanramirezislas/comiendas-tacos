@@ -71,7 +71,7 @@ const NuevoPlatillo = () => {
 	});
 
 	return (
-		<>
+		<div className="ml-80">
 			<h1 className="mb-4 text-3xl font-light">Agregar Platillo</h1>
 
 			<div className="flex justify-center mt-10">
@@ -213,7 +213,7 @@ const NuevoPlatillo = () => {
 					</form>
 				</div>
 			</div>
-		</>
+		</div>
 	);
 };
 
